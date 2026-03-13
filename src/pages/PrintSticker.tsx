@@ -66,7 +66,7 @@ export default function PrintSticker() {
       const barcode = order.barcode || '';
       return `
         <div class="sticker">
-          <div class="header">MODEX</div>
+          <div class="header">alshbh test</div>
           <div class="date">${new Date(order.created_at).toLocaleDateString('ar-EG')}</div>
           <div class="barcode-num">${barcode}</div>
           <div class="row"><span>الكود: <b>${order.customer_code || '-'}</b></span></div>
@@ -107,7 +107,7 @@ export default function PrintSticker() {
       const barcode = order.barcode || '';
       return `
         <div class="invoice-page">
-          <div class="header">MODEX</div>
+          <div class="header">alshbh test</div>
           <div class="date">${new Date().toLocaleDateString('ar-EG')} - فاتورة ${i + 1} من ${selectedOrders.length}</div>
           <table>
             <tr><th>الكود</th><td>${order.customer_code || '-'}</td></tr>

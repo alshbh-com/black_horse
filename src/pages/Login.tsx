@@ -39,7 +39,7 @@ export default function Login() {
               <Package className="h-8 w-8 text-primary-foreground" />
             </div>
             <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
-              MODEX
+              alshbh test
             </h1>
             <p className="text-sm text-muted-foreground mt-1">نظام إدارة الشحن</p>
           </div>
