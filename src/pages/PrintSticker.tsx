@@ -107,7 +107,7 @@ export default function PrintSticker() {
       const barcode = order.barcode || '';
       return `
         <div class="invoice-page">
-          <div class="header">MODEX</div>
+          <div class="header">alshbh test</div>
           <div class="date">${new Date().toLocaleDateString('ar-EG')} - فاتورة ${i + 1} من ${selectedOrders.length}</div>
           <table>
             <tr><th>الكود</th><td>${order.customer_code || '-'}</td></tr>

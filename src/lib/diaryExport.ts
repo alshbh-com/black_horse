@@ -176,7 +176,7 @@ export function exportDiaryToPDF(
   .summary div { margin: 3px 0; }
   .page-break { page-break-before: always; }
 </style></head><body>
-  <div class="header">MODEX - ${officeName}</div>
+  <div class="header">alshbh test - ${officeName}</div>
   <div class="sub">يومية رقم ${diary.diary_number} | ${format(new Date(diary.diary_date), 'dd/MM/yyyy')} | ${diary.is_closed ? 'مقفولة' : 'مفتوحة'} | ${diaryOrders.length} أوردر</div>
   ${financialSection}
   ${orangeSection}
