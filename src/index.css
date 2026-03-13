@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 260 15% 8%;
+    --foreground: 260 10% 95%;
+
+    --card: 260 18% 11%;
+    --card-foreground: 260 10% 95%;
+
+    --popover: 260 18% 11%;
+    --popover-foreground: 260 10% 95%;
+
+    --primary: 265 85% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 280 80% 65%;
+
+    --secondary: 260 15% 16%;
+    --secondary-foreground: 260 10% 90%;
+
+    --muted: 260 12% 16%;
+    --muted-foreground: 260 10% 55%;
+
+    --accent: 265 30% 20%;
+    --accent-foreground: 260 10% 95%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 260 15% 18%;
+    --input: 260 15% 18%;
+    --ring: 265 85% 60%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 260 20% 6%;
+    --sidebar-foreground: 260 10% 82%;
+    --sidebar-primary: 265 85% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 265 25% 15%;
+    --sidebar-accent-foreground: 260 10% 92%;
+    --sidebar-border: 260 15% 14%;
+    --sidebar-ring: 265 85% 60%;
+
+    --success: 160 70% 40%;
+    --success-foreground: 0 0% 100%;
+    --warning: 40 90% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(265 85% 60%), hsl(280 80% 65%));
+    --shadow-glow: 0 4px 30px -8px hsl(265 85% 60% / 0.3);
+    --shadow-card: 0 2px 20px -4px hsl(260 20% 4% / 0.5);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    direction: rtl;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.5);
+  }
+}
+
+@layer utilities {
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+  .glass-effect {
+    backdrop-filter: blur(12px);
+    background: hsl(var(--card) / 0.7);
+  }
+}
