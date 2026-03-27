@@ -3,7 +3,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { Lock, Loader2, Package } from 'lucide-react';
+import { Lock, Loader2 } from 'lucide-react';
+import blackHorseLogo from '@/assets/black-horse-logo.jpg';
 
 export default function Login() {
   const [password, setPassword] = useState('');
@@ -35,9 +36,7 @@ export default function Login() {
         <CardContent className="pt-8 pb-6 px-6">
           {/* Logo */}
           <div className="text-center mb-8">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl gradient-primary shadow-glow mb-4">
-              <Package className="h-8 w-8 text-primary-foreground" />
-            </div>
+            <img src={blackHorseLogo} alt="بلاك هورس" className="mx-auto h-20 w-20 rounded-2xl object-cover shadow-glow mb-4" />
             <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
               بلاك هورس
             </h1>
