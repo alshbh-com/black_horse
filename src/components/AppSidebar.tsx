@@ -79,10 +79,10 @@ export function AppSidebar() {
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-2 group-data-[collapsible=icon]:justify-center">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl gradient-primary shadow-glow font-bold text-sm text-primary-foreground">
-            A
+            BH
           </div>
           <span className="text-lg font-extrabold text-sidebar-foreground group-data-[collapsible=icon]:hidden tracking-wide">
-            alshbh test
+            بلاك هورس
           </span>
         </div>
       </SidebarHeader>
