@@ -735,6 +735,7 @@ export type Database = {
           customer_name: string
           customer_phone: string | null
           delivery_price: number
+          governorate: string | null
           id: string
           is_closed: boolean
           is_settled: boolean
@@ -763,6 +764,7 @@ export type Database = {
           customer_name?: string
           customer_phone?: string | null
           delivery_price?: number
+          governorate?: string | null
           id?: string
           is_closed?: boolean
           is_settled?: boolean
@@ -791,6 +793,7 @@ export type Database = {
           customer_name?: string
           customer_phone?: string | null
           delivery_price?: number
+          governorate?: string | null
           id?: string
           is_closed?: boolean
           is_settled?: boolean
