@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Session, User } from '@supabase/supabase-js';
 
@@ -20,6 +20,10 @@ interface AuthState {
 
 const AuthContext = createContext<AuthState | null>(null);
 
+function codeToEmail(code: string) {
+  return code.replace(/@/g, '_at_').replace(/[^a-zA-Z0-9._-]/g, '_') + '@modex.ship';
+}
+
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');
@@ -31,8 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [loading, setLoading] = useState(true);
-  const initializedRef = useRef(false);
-  const skipNextRoleFetch = useRef(false);
+  const roleRequestRef = useRef(0);
 
   const fetchRoles = async (userId: string): Promise<AppRole[]> => {
     try {
@@ -40,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .from('user_roles')
         .select('role')
         .eq('user_id', userId);
-      return (data?.map(r => r.role as AppRole)) || [];
+      return (data?.map((r) => r.role as AppRole)) || [];
     } catch {
       return [];
     }
@@ -49,52 +52,77 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, sess) => {
-      if (!mounted) return;
-      
-      if (event === 'SIGNED_OUT') {
-        setSession(null);
-        setUser(null);
-        setRoles([]);
-        setLoading(false);
+    const applySignedOutState = () => {
+      roleRequestRef.current += 1;
+      setSession(null);
+      setUser(null);
+      setRoles([]);
+      setLoading(false);
+    };
+
+    const syncRoles = (userId: string) => {
+      const requestId = ++roleRequestRef.current;
+      setLoading(true);
+
+      window.setTimeout(() => {
+        void fetchRoles(userId)
+          .then((userRoles) => {
+            if (!mounted || roleRequestRef.current !== requestId) return;
+            setRoles(userRoles);
+          })
+          .finally(() => {
+            if (!mounted || roleRequestRef.current !== requestId) return;
+            setLoading(false);
+          });
+      }, 0);
+    };
+
+    const handleSession = (sess: Session | null, shouldRefreshRoles = true) => {
+      setSession(sess);
+      setUser(sess?.user ?? null);
+
+      if (!sess?.user) {
+        applySignedOutState();
         return;
       }
 
-      if (event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
-        setSession(sess);
-        setUser(sess?.user ?? null);
-
-        if (sess?.user) {
-          if (skipNextRoleFetch.current) {
-            skipNextRoleFetch.current = false;
-            setLoading(false);
-            return;
-          }
-          setTimeout(async () => {
-            if (!mounted) return;
-            const userRoles = await fetchRoles(sess.user.id);
-            if (mounted) {
-              setRoles(userRoles);
-              setLoading(false);
-            }
-          }, 0);
-        } else {
-          setRoles([]);
-          setLoading(false);
-        }
-      }
-    });
-
-    supabase.auth.getSession().then(({ data: { session: sess } }) => {
-      if (!mounted) return;
-      if (!sess) {
+      if (shouldRefreshRoles) {
+        syncRoles(sess.user.id);
+      } else {
         setLoading(false);
       }
-      // Session handling is done by onAuthStateChange listener
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, sess) => {
+      if (!mounted) return;
+
+      if (event === 'SIGNED_OUT') {
+        applySignedOutState();
+        return;
+      }
+
+      if (event === 'TOKEN_REFRESHED') {
+        handleSession(sess, false);
+        return;
+      }
+
+      if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+        handleSession(sess, true);
+      }
     });
 
-    const timeout = setTimeout(() => {
-      if (mounted && loading) {
+    void supabase.auth.getSession()
+      .then(({ data: { session: sess } }) => {
+        if (!mounted) return;
+        handleSession(sess ?? null, true);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        applySignedOutState();
+      });
+
+    const timeout = window.setTimeout(() => {
+      if (mounted) {
         setLoading(false);
       }
     }, 8000);
@@ -108,41 +136,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (password: string): Promise<{ error?: string }> => {
     try {
-      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-      const res = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/auth-login`,
-        {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          },
-          body: JSON.stringify({ password }),
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) return { error: data.error || 'خطأ في تسجيل الدخول' };
-      
-      if (data.session) {
-        const userRoles = (data.roles || []) as AppRole[];
-        setRoles(userRoles);
-        skipNextRoleFetch.current = true;
-        
-        await supabase.auth.setSession({
-          access_token: data.session.access_token,
-          refresh_token: data.session.refresh_token,
-        });
+      setLoading(true);
+      const email = codeToEmail(password);
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        setLoading(false);
+        return { error: 'كلمة المرور غير صحيحة' };
       }
       return {};
     } catch {
+      setLoading(false);
       return { error: 'خطأ في الاتصال بالخادم' };
     }
   };
 
   const logout = async () => {
+    roleRequestRef.current += 1;
     setRoles([]);
     setSession(null);
     setUser(null);
+    setLoading(false);
     await supabase.auth.signOut();
   };
 
@@ -162,3 +175,4 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     </AuthContext.Provider>
   );
 }
+
