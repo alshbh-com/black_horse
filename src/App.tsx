@@ -51,8 +51,7 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 function LoginRedirect() {
-  const { session, loading } = useAuth();
-  if (loading) return null;
+  const { session } = useAuth();
   if (session) return <Navigate to="/" replace />;
   return <Login />;
 }
