@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-react';
 
 interface Props {
   children: React.ReactNode;
-  requiredRole?: 'owner' | 'admin' | 'owner_or_admin';
+  requiredRole?: 'owner' | 'admin' | 'owner_or_admin' | 'courier' | 'office';
 }
 
 export default function ProtectedRoute({ children, requiredRole }: Props) {
@@ -33,6 +33,18 @@ export default function ProtectedRoute({ children, requiredRole }: Props) {
   if (requiredRole === 'owner_or_admin' && !isOwnerOrAdmin) {
     if (isOffice) return <Navigate to="/office-portal" replace />;
     return <Navigate to="/courier-orders" replace />;
+  }
+
+  if (requiredRole === 'courier') {
+    if (isOwnerOrAdmin) return <Navigate to="/" replace />;
+    if (isOffice) return <Navigate to="/office-portal" replace />;
+    if (!isCourier) return <Navigate to="/login" replace />;
+  }
+
+  if (requiredRole === 'office') {
+    if (isOwnerOrAdmin) return <Navigate to="/" replace />;
+    if (isCourier) return <Navigate to="/courier-orders" replace />;
+    if (!isOffice) return <Navigate to="/login" replace />;
   }
 
   return <>{children}</>;
