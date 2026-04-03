@@ -85,25 +85,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    supabase.auth.getSession().then(async ({ data: { session: sess }, error }) => {
+    supabase.auth.getSession().then(({ data: { session: sess } }) => {
       if (!mounted) return;
-      if (error || !sess) {
-        setSession(null);
-        setUser(null);
-        setRoles([]);
+      if (!sess) {
         setLoading(false);
-        if (error) {
-          await supabase.auth.signOut();
-        }
-        return;
       }
+      // Session handling is done by onAuthStateChange listener
     });
 
     const timeout = setTimeout(() => {
       if (mounted && loading) {
         setLoading(false);
       }
-    }, 5000);
+    }, 8000);
 
     return () => {
       mounted = false;
