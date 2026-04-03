@@ -220,12 +220,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (password: string): Promise<{ error?: string }> => {
     try {
       persistAuthDebug('login_attempt', { passwordLength: password.length });
-      setLoading(true);
       const email = codeToEmail(password);
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         persistAuthDebug('login_failed', { message: error.message });
-        setLoading(false);
         return { error: 'كلمة المرور غير صحيحة' };
       }
       persistAuthDebug('login_submitted', {
@@ -237,7 +235,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       persistAuthDebug('login_exception', {
         message: error instanceof Error ? error.message : 'unknown_error',
       });
-      setLoading(false);
       return { error: 'خطأ في الاتصال بالخادم' };
     }
   };
