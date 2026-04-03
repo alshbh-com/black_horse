@@ -67,10 +67,10 @@ const App = () => (
             <Route path="/login" element={<LoginRedirect />} />
             <Route path="/tracking" element={<TrackingPage />} />
             <Route path="/courier-orders" element={
-              <ProtectedRoute><CourierOrders /></ProtectedRoute>
+              <ProtectedRoute requiredRole="courier"><CourierOrders /></ProtectedRoute>
             } />
             <Route path="/office-portal" element={
-              <ProtectedRoute><OfficePortal /></ProtectedRoute>
+              <ProtectedRoute requiredRole="office"><OfficePortal /></ProtectedRoute>
             } />
             {/* Accounting System - separate full layout */}
             <Route path="/accounting-system" element={
