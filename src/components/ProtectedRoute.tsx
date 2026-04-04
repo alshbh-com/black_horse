@@ -10,6 +10,13 @@ interface Props {
 export default function ProtectedRoute({ children, requiredRole }: Props) {
   const { session, loading, isOwner, isAdmin, isOwnerOrAdmin, isCourier, isOffice } = useAuth();
 
+  const fallbackRoute = (() => {
+    if (isOwnerOrAdmin) return '/';
+    if (isOffice) return '/office-portal';
+    if (isCourier) return '/courier-orders';
+    return '/login';
+  })();
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -23,28 +30,27 @@ export default function ProtectedRoute({ children, requiredRole }: Props) {
   }
 
   if (requiredRole === 'owner' && !isOwner) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={fallbackRoute} replace />;
   }
 
   if (requiredRole === 'admin' && !isAdmin && !isOwner) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={fallbackRoute} replace />;
   }
 
   if (requiredRole === 'owner_or_admin' && !isOwnerOrAdmin) {
-    if (isOffice) return <Navigate to="/office-portal" replace />;
-    return <Navigate to="/courier-orders" replace />;
+    return <Navigate to={fallbackRoute} replace />;
   }
 
   if (requiredRole === 'courier') {
-    if (isOwnerOrAdmin) return <Navigate to="/" replace />;
-    if (isOffice) return <Navigate to="/office-portal" replace />;
-    if (!isCourier) return <Navigate to="/login" replace />;
+    if (!isCourier || isOwnerOrAdmin || isOffice) {
+      return <Navigate to={fallbackRoute} replace />;
+    }
   }
 
   if (requiredRole === 'office') {
-    if (isOwnerOrAdmin) return <Navigate to="/" replace />;
-    if (isCourier) return <Navigate to="/courier-orders" replace />;
-    if (!isOffice) return <Navigate to="/login" replace />;
+    if (!isOffice || isOwnerOrAdmin || isCourier) {
+      return <Navigate to={fallbackRoute} replace />;
+    }
   }
 
   return <>{children}</>;
